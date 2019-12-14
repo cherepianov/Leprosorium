@@ -13,8 +13,21 @@ before do
   init_db
 end
 
+configure do
+  init_db
+  @db.execute 'create table if not exists Posts
+  (
+  id integer primary key autoincrement,
+  created_date date,
+  content text
+  )'
+
+end
+
 get '/' do
-	erb "Hello! <a href=\"https://github.com/bootstrap-ruby/sinatra-bootstrap\">Original</a> pattern has been modified for <a href=\"http://rubyschool.us/\">Ruby School</a>"			
+  #выбираеи список постов из базы данных
+  @results = @db.execute 'select * from posts order by id desc'
+	erb :index
 end
 
 get '/new' do
@@ -23,5 +36,17 @@ end
 
 post '/new' do
   content = params[:content]
+  if content.length <= 0
+    @error = 'Type post text'
+    return erb :new
+  end
+
+  #сохранение данных в БД
+
+  @db.execute 'insert into Posts (content, created_date)
+ values (?, datetime())', [content]
+
+  redirect to '/'
+
   erb "You typed: #{content}"
 end
