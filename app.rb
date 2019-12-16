@@ -50,3 +50,19 @@ post '/new' do
 
   erb "You typed: #{content}"
 end
+
+get '/details/:post_id' do
+
+  #получаем переменную из url
+  post_id = params[:post_id]
+
+  #получаем список постов
+  # (у нас будет только 1 пост)
+  results = @db.execute 'select * from posts where id = ?', [post_id]
+
+  #выбираем этот один пост в переменную @row
+  @row = results[0]
+
+  #возвращаем представление 
+  erb :details
+end
