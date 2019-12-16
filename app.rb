@@ -24,6 +24,17 @@ configure do
 
 end
 
+configure do
+  init_db
+  @db.execute 'create table if not exists Comments
+  (
+  id integer primary key autoincrement,
+  created_date date,
+  content text
+  post_id integer
+  )'
+end
+
 get '/' do
   #выбираеи список постов из базы данных
   @results = @db.execute 'select * from posts order by id desc'
@@ -63,6 +74,20 @@ get '/details/:post_id' do
   #выбираем этот один пост в переменную @row
   @row = results[0]
 
-  #возвращаем представление 
+  #возвращаем представление
   erb :details
+end
+
+# обрабюотчик post-запроса /details/...
+# (браузер отправляет данные на сервер, мы их принимаем)
+post '/details/:post_id' do
+
+  #получаем переменную из url
+  post_id = params[:post_id]
+
+  #получаем переменную из post-запроса
+  content = params[:content]
+
+  erb "You typed comment #{content} for post #{post_id}"
+
 end
